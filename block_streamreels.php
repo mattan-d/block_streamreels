@@ -163,8 +163,22 @@ class block_streamreels extends block_base {
 
         $track = html_writer::div($slideshtml, 'streamreels-track');
 
+        $openfullscreenlabel = get_string('openfullscreen', 'block_streamreels');
+        $openfs = html_writer::tag(
+            'button',
+            $OUTPUT->pix_icon('e/fullscreen', '', 'core'),
+            [
+                'type' => 'button',
+                'class' => 'streamreels-fs-open',
+                'aria-label' => $openfullscreenlabel,
+                'title' => $openfullscreenlabel,
+                'aria-expanded' => 'false',
+                'aria-haspopup' => 'dialog',
+            ]
+        );
+
         $viewer = html_writer::div(
-            $counter . $progress . $nav . $track,
+            $counter . $openfs . $progress . $nav . $track,
             'streamreels-viewer',
             [
                 'id' => $viewerid,
@@ -174,21 +188,6 @@ class block_streamreels extends block_base {
         );
 
         $hint = html_writer::div(get_string('navigationshint', 'block_streamreels'), 'streamreels-hint');
-
-        $openfullscreenlabel = get_string('openfullscreen', 'block_streamreels');
-        $openfstext = html_writer::span($openfullscreenlabel, 'streamreels-fs-open-text');
-        $openfs = html_writer::tag(
-            'button',
-            $OUTPUT->pix_icon('e/fullscreen', '', 'core') . $openfstext,
-            [
-                'type' => 'button',
-                'class' => 'streamreels-fs-open',
-                'aria-label' => $openfullscreenlabel,
-                'aria-expanded' => 'false',
-                'aria-haspopup' => 'dialog',
-            ]
-        );
-        $toolbar = html_writer::div($openfs, 'streamreels-toolbar');
 
         $mount = html_writer::div($viewer . $hint, 'streamreels-mount');
 
@@ -200,7 +199,7 @@ class block_streamreels extends block_base {
             ],
         ]);
 
-        $this->content->text = html_writer::div($toolbar . $mount, 'streamreels-block');
+        $this->content->text = html_writer::div($mount, 'streamreels-block');
 
         return $this->content;
     }

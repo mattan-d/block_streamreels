@@ -199,88 +199,45 @@
     line-height: 1.35;
 }
 
-/* Toolbar + fullscreen entry button */
-.block_streamreels .streamreels-toolbar {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-bottom: 0.65rem;
-}
-
-.block_streamreels .streamreels-fs-open {
+/* Fullscreen — icon-only pill on video (same language as counter, opposite corner) */
+.streamreels-viewer .streamreels-fs-open {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    z-index: 7;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    width: 100%;
-    max-width: 320px;
-    margin: 0 auto;
-    padding: 0.35rem 0.75rem;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    width: 1.9rem;
+    height: 1.9rem;
+    margin: 0;
+    padding: 0;
+    border: none;
     border-radius: 999px;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    line-height: 1.35;
-    color: rgba(0, 0, 0, 0.52);
-    background: rgba(0, 0, 0, 0.025);
-    box-shadow: none;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
     cursor: pointer;
-    transition:
-        color 0.2s ease,
-        background-color 0.2s ease,
-        border-color 0.2s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    transition: background 0.15s ease, transform 0.12s ease;
 }
 
-.block_streamreels .streamreels-fs-open:hover {
-    color: rgba(0, 0, 0, 0.72);
-    background: rgba(0, 0, 0, 0.045);
-    border-color: rgba(0, 0, 0, 0.14);
+.streamreels-viewer .streamreels-fs-open:hover {
+    background: rgba(0, 0, 0, 0.6);
+    transform: scale(1.05);
 }
 
-.block_streamreels .streamreels-fs-open:focus-visible {
-    outline: 2px solid rgba(99, 102, 241, 0.45);
+.streamreels-viewer .streamreels-fs-open:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
     outline-offset: 2px;
 }
 
-.block_streamreels .streamreels-fs-open .streamreels-fs-open-text {
-    flex: 0 1 auto;
-}
-
-.block_streamreels .streamreels-fs-open img {
-    width: 0.9375rem;
-    height: 0.9375rem;
-    flex-shrink: 0;
-    opacity: 0.5;
-    filter: none;
+.streamreels-viewer .streamreels-fs-open img {
+    width: 0.95rem;
+    height: 0.95rem;
+    display: block;
+    filter: brightness(0) invert(1);
+    opacity: 0.92;
     vertical-align: middle;
-}
-
-.block_streamreels .streamreels-fs-open:hover img {
-    opacity: 0.65;
-}
-
-@media (prefers-color-scheme: dark) {
-    .block_streamreels .streamreels-fs-open {
-        color: rgba(255, 255, 255, 0.55);
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(255, 255, 255, 0.12);
-    }
-
-    .block_streamreels .streamreels-fs-open:hover {
-        color: rgba(255, 255, 255, 0.78);
-        background: rgba(255, 255, 255, 0.07);
-        border-color: rgba(255, 255, 255, 0.18);
-    }
-
-    .block_streamreels .streamreels-fs-open img {
-        opacity: 0.55;
-        filter: brightness(0) invert(1);
-    }
-
-    .block_streamreels .streamreels-fs-open:hover img {
-        opacity: 0.75;
-    }
 }
 
 .block_streamreels .streamreels-fs-placeholder {
@@ -408,6 +365,11 @@ body.streamreels-fs-open {
 [dir="rtl"] .streamreels-viewer .streamreels-counter {
     left: auto;
     right: 10px;
+}
+
+[dir="rtl"] .streamreels-viewer .streamreels-fs-open {
+    right: auto;
+    left: 14px;
 }
 
 [dir="rtl"] .streamreels-fs-header {
