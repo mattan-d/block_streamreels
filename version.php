@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026040600;
+$plugin->version   = 2026040603;
 $plugin->requires  = 2022112800;
 $plugin->component = 'block_streamreels';
 $plugin->maturity  = MATURITY_STABLE;

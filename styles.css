@@ -1,79 +1,226 @@
-/* Stream reels block — horizontal rail */
+/* Stream reels — vertical viewer (Facebook / Reels style) */
 .block_streamreels .streamreels-block {
-    margin: 0 -0.25rem;
+    margin: 0 auto;
 }
 
-.block_streamreels .streamreels-rail {
-    display: flex;
-    flex-direction: row;
-    gap: 0.75rem;
-    overflow-x: auto;
-    padding: 0.25rem 0.25rem 0.5rem;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-}
-
-.block_streamreels .streamreels-item {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    width: 140px;
-}
-
-.block_streamreels .streamreels-card {
-    display: block;
-    border-radius: 10px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.05);
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.block_streamreels .streamreels-card:hover,
-.block_streamreels .streamreels-card:focus {
-    text-decoration: none;
-    color: inherit;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.block_streamreels .streamreels-thumb {
-    display: block;
+.block_streamreels .streamreels-viewer {
+    position: relative;
     width: 100%;
+    max-width: min(100%, 320px);
+    margin: 0 auto;
     aspect-ratio: 9 / 16;
-    object-fit: cover;
-    background: #222;
+    max-height: min(85vh, 620px);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #0a0a0a;
+    outline: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.28);
+    touch-action: pan-y;
 }
 
-.block_streamreels .streamreels-placeholder {
+.block_streamreels .streamreels-track {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+
+.block_streamreels .streamreels-slide {
+    flex: 0 0 100%;
+    height: 100%;
+    min-height: 0;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.block_streamreels .streamreels-slide-media {
+    position: absolute;
+    inset: 0;
+    background-color: #111;
+    background-size: cover;
+    background-position: center;
+}
+
+.block_streamreels .streamreels-embed {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    z-index: 1;
+}
+
+.block_streamreels .streamreels-fallback-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+}
+
+.block_streamreels .streamreels-fallback-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.block_streamreels .streamreels-slide-meta {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    padding: 2.2rem 0.85rem 0.75rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.35) 55%, transparent 100%);
+    color: #fff;
+    font-size: 0.88rem;
+    line-height: 1.35;
+    pointer-events: auto;
+}
+
+.block_streamreels .streamreels-slide-title {
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    margin-bottom: 0.35rem;
+}
+
+.block_streamreels .streamreels-slide-meta .streamreels-duration {
+    font-size: 0.78rem;
+    opacity: 0.85;
+    margin-bottom: 0.35rem;
+}
+
+.block_streamreels .streamreels-external {
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 0.8rem;
+    text-decoration: underline;
+}
+
+.block_streamreels .streamreels-external:hover {
+    color: #fff;
+}
+
+/* Side navigation */
+.block_streamreels .streamreels-nav-col {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 6;
+    pointer-events: auto;
+}
+
+.block_streamreels .streamreels-nav {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 0;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    aspect-ratio: 9 / 16;
-    padding: 0.5rem;
-    font-size: 0.75rem;
-    line-height: 1.2;
-    text-align: center;
-    background: linear-gradient(145deg, #2a2a3a, #1a1a24);
-    color: #f0f0f0;
+    transition: background 0.15s ease, opacity 0.15s ease;
 }
 
-.block_streamreels .streamreels-caption {
-    padding: 0.4rem 0.5rem 0.5rem;
-    font-size: 0.78rem;
-    line-height: 1.25;
-    max-height: 3.5rem;
+.block_streamreels .streamreels-nav:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.block_streamreels .streamreels-nav:disabled {
+    opacity: 0.28;
+    cursor: default;
+}
+
+/* Progress rail (right edge) */
+.block_streamreels .streamreels-progress {
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    right: 2px;
+    width: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.18);
+    z-index: 5;
     overflow: hidden;
+    pointer-events: none;
 }
 
-.block_streamreels .streamreels-duration {
-    display: block;
-    margin-top: 0.15rem;
-    font-size: 0.7rem;
-    opacity: 0.75;
+.block_streamreels .streamreels-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 2px;
+    transition: height 0.35s ease;
 }
 
-body.behat-site .block_streamreels .streamreels-rail {
-    flex-wrap: wrap;
-    overflow: visible;
+/* Counter */
+.block_streamreels .streamreels-counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 6;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+}
+
+.block_streamreels .streamreels-hint {
+    margin-top: 0.5rem;
+    font-size: 0.72rem;
+    color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.behat-site .block_streamreels .streamreels-viewer {
+    max-height: none;
+    aspect-ratio: auto;
+    min-height: 200px;
+}
+
+body.behat-site .block_streamreels .streamreels-track {
+    flex-direction: column;
+    transform: none !important;
+}
+
+body.behat-site .block_streamreels .streamreels-slide {
+    flex: 0 0 auto;
+    min-height: 180px;
+    margin-bottom: 0.5rem;
+}
+
+/* RTL: keep controls on the logical “end” side */
+[dir="rtl"] .block_streamreels .streamreels-nav-col {
+    right: auto;
+    left: 6px;
+}
+
+[dir="rtl"] .block_streamreels .streamreels-progress {
+    right: auto;
+    left: 2px;
+}
+
+[dir="rtl"] .block_streamreels .streamreels-counter {
+    left: auto;
+    right: 10px;
 }

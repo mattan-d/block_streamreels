@@ -32,6 +32,11 @@ $string['adminmissingstreamconfig'] = 'כתובת Stream או מפתח Stream ל
 $string['noteachers'] = 'אין מורים משויכים לקורס זה, ולכן לא ניתן לטעון רילס.';
 $string['noreels'] = 'לא נמצאו רילס למרצי הקורס בפלטפורמת Stream.';
 $string['untitled'] = 'ללא כותרת';
+$string['nextreel'] = 'רילס הבא';
+$string['previousreel'] = 'רילס קודם';
+$string['openinstream'] = 'פתיחה ב־Stream';
+$string['viewerregion'] = 'רילס של המרצה';
+$string['navigationshint'] = 'החלקה למעלה או הקשה בצד ימין — הסרטון הבא. החלקה למטה או הקשה בצד שמאל — הקודם.';
 
 $string['privacy:metadata:streamreels'] = 'הבלוק מבקש רילס ממופע Stream באמצעות כתובות דוא״ל של מרצים (כפי שהוגדרו בתוסף Stream המקומי). הבלוק אינו שומר מידע זה במודל.';
 $string['privacy:metadata:streamreels:email'] = 'דוא״ל של מרצים נשלח ל־Stream כדי להתאים את הרילס של המרצה.';

@@ -108,15 +108,76 @@ class block_streamreels extends block_base {
 
         $this->page->requires->css('/blocks/streamreels/styles.css');
 
-        $itemshtml = '';
-        foreach (array_slice($reels, 0, self::DISPLAY_LIMIT) as $item) {
-            $itemshtml .= $this->render_reel_card($item);
+        $slice = array_slice($reels, 0, self::DISPLAY_LIMIT);
+        $viewerid = 'streamreels-viewer-' . (int) $this->instance->id;
+
+        $slideshtml = '';
+        $slideindex = 0;
+        foreach ($slice as $item) {
+            $slide = $this->render_reel_slide($item, $slideindex);
+            if ($slide === '') {
+                continue;
+            }
+            $slideshtml .= $slide;
+            $slideindex++;
         }
 
-        $this->content->text = html_writer::div(
-            html_writer::div($itemshtml, 'streamreels-rail'),
-            'streamreels-block'
+        if ($slideindex === 0) {
+            $this->content->text = html_writer::div(get_string('noreels', 'block_streamreels'), 'text-muted');
+            return $this->content;
+        }
+
+        $total = $slideindex;
+
+        $progress = html_writer::div(html_writer::div('', ['class' => 'streamreels-progress-bar']), 'streamreels-progress');
+
+        $counter = html_writer::div(
+            html_writer::span('1', 'streamreels-counter-current')
+            . ' / '
+            . html_writer::span((string) $total, 'streamreels-counter-total'),
+            'streamreels-counter'
         );
+
+        $nav = html_writer::div(
+            html_writer::tag(
+                'button',
+                '↑',
+                [
+                    'type' => 'button',
+                    'class' => 'streamreels-nav streamreels-nav-prev',
+                    'aria-label' => get_string('previousreel', 'block_streamreels'),
+                    'disabled' => 'disabled',
+                ]
+            )
+            . html_writer::tag(
+                'button',
+                '↓',
+                [
+                    'type' => 'button',
+                    'class' => 'streamreels-nav streamreels-nav-next',
+                    'aria-label' => get_string('nextreel', 'block_streamreels'),
+                ]
+            ),
+            'streamreels-nav-col'
+        );
+
+        $track = html_writer::div($slideshtml, 'streamreels-track');
+
+        $viewer = html_writer::div(
+            $counter . $progress . $nav . $track,
+            'streamreels-viewer',
+            [
+                'id' => $viewerid,
+                'role' => 'region',
+                'aria-label' => get_string('viewerregion', 'block_streamreels'),
+            ]
+        );
+
+        $hint = html_writer::div(get_string('navigationshint', 'block_streamreels'), 'streamreels-hint');
+
+        $this->page->requires->js_call_amd('block_streamreels/reels', 'init', [$viewerid]);
+
+        $this->content->text = html_writer::div($viewer . $hint, 'streamreels-block');
 
         return $this->content;
     }
@@ -166,12 +227,11 @@ class block_streamreels extends block_base {
                 if (!is_array($row)) {
                     continue;
                 }
-                $id = $row['id'] ?? null;
-                if ($id === null || $id === '') {
+                $id = $this->reel_field_string($row['id'] ?? '');
+                if ($id === '') {
                     continue;
                 }
-                $key = (string) $id;
-                $merged[$key] = $row;
+                $merged[$id] = $row;
             }
         }
 
@@ -185,38 +245,104 @@ class block_streamreels extends block_base {
     }
 
     /**
-     * @param array<string,mixed> $item
+     * Normalise API fields that may be string, number, or occasionally nested structures.
+     *
+     * @param mixed $value
      */
-    private function render_reel_card(array $item): string {
-        $title = isset($item['title']) ? format_string($item['title'], true) : get_string('untitled', 'block_streamreels');
-        $watch = $item['watch_url'] ?? '';
-        if (!$watch) {
+    private function reel_field_string($value, int $depth = 0): string {
+        if ($depth > 4) {
             return '';
         }
-        $thumb = $item['thumbnail'] ?? '';
-        $duration = isset($item['duration']) ? s($item['duration']) : '';
+        if (is_string($value)) {
+            return trim($value);
+        }
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+        if (is_array($value)) {
+            foreach ($value as $nested) {
+                $s = $this->reel_field_string($nested, $depth + 1);
+                if ($s !== '') {
+                    return $s;
+                }
+            }
+            return '';
+        }
+        return '';
+    }
 
-        $meta = $duration !== '' ? html_writer::span($duration, 'streamreels-duration') : '';
+    /**
+     * One vertical slide (embed or fallback link).
+     *
+     * @param array<string,mixed> $item
+     */
+    private function render_reel_slide(array $item, int $index): string {
+        $titleraw = $this->reel_field_string($item['title'] ?? '');
+        $title = $titleraw !== ''
+            ? format_string($titleraw, true)
+            : get_string('untitled', 'block_streamreels');
 
-        $img = '';
-        if ($thumb) {
-            $img = html_writer::empty_tag('img', [
-                'src' => $thumb,
-                'alt' => $title,
-                'class' => 'streamreels-thumb',
-                'loading' => 'lazy',
-            ]);
-        } else {
-            $img = html_writer::div($title, 'streamreels-placeholder');
+        $watch = $this->reel_field_string($item['watch_url'] ?? '');
+        $embed = $this->reel_field_string($item['embed_url'] ?? '');
+        $thumb = $this->reel_field_string($item['thumbnail'] ?? '');
+
+        $durationraw = $this->reel_field_string($item['duration'] ?? '');
+        $duration = $durationraw !== '' ? s($durationraw) : '';
+
+        $mediaattrs = ['class' => 'streamreels-slide-media'];
+        if ($thumb !== '') {
+            $mediaattrs['style'] = 'background-image:url("' . s($thumb) . '");';
         }
 
-        $inner = $img . html_writer::div($title . $meta, 'streamreels-caption');
-        $link = html_writer::link($watch, $inner, [
-            'class' => 'streamreels-card',
-            'target' => '_blank',
-            'rel' => 'noopener noreferrer',
-        ]);
+        $media = '';
+        if ($embed !== '') {
+            $media = html_writer::tag('iframe', '', [
+                'class' => 'streamreels-embed',
+                'title' => $title,
+                'allowfullscreen' => 'true',
+                'allow' => 'autoplay; encrypted-media; picture-in-picture; fullscreen',
+                'data-embed-src' => $embed,
+                'src' => 'about:blank',
+            ]);
+        } else if ($watch !== '') {
+            $img = $thumb !== ''
+                ? html_writer::empty_tag('img', [
+                    'src' => $thumb,
+                    'alt' => '',
+                    'class' => 'streamreels-fallback-thumb',
+                    'loading' => 'lazy',
+                ])
+                : html_writer::div($title, 'streamreels-slide-title');
+            $media = html_writer::link($img, $watch, [
+                'class' => 'streamreels-fallback-link',
+                'target' => '_blank',
+                'rel' => 'noopener noreferrer',
+            ]);
+        } else {
+            return '';
+        }
 
-        return html_writer::div($link, 'streamreels-item');
+        $metabits = html_writer::div($title, 'streamreels-slide-title');
+        if ($duration !== '') {
+            $metabits .= html_writer::div($duration, 'streamreels-duration');
+        }
+        if ($watch !== '') {
+            $metabits .= html_writer::link(
+                get_string('openinstream', 'block_streamreels'),
+                $watch,
+                ['class' => 'streamreels-external', 'target' => '_blank', 'rel' => 'noopener noreferrer']
+            );
+        }
+
+        $meta = html_writer::div($metabits, 'streamreels-slide-meta');
+
+        return html_writer::div(
+            html_writer::div($media, '', $mediaattrs) . $meta,
+            'streamreels-slide',
+            [
+                'data-index' => (string) $index,
+                'aria-hidden' => $index === 0 ? 'false' : 'true',
+            ]
+        );
     }
 }
