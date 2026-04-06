@@ -129,7 +129,7 @@ class block_streamreels extends block_base {
 
         $total = $slideindex;
 
-        $progress = html_writer::div(html_writer::div('', ['class' => 'streamreels-progress-bar']), 'streamreels-progress');
+        $progress = html_writer::div(html_writer::div('', 'streamreels-progress-bar'), 'streamreels-progress');
 
         $counter = html_writer::div(
             html_writer::span('1', 'streamreels-counter-current')
