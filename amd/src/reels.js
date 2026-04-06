@@ -249,12 +249,17 @@ define([], function() {
             const header = document.createElement('div');
             header.className = 'streamreels-fs-header';
 
+            const titleEl = document.createElement('span');
+            titleEl.className = 'streamreels-fs-title';
+            titleEl.textContent = dialogTitle;
+
             const closeBtn = document.createElement('button');
             closeBtn.type = 'button';
-            closeBtn.className = 'streamreels-fs-close btn btn-icon';
+            closeBtn.className = 'streamreels-fs-close';
             closeBtn.innerHTML = '&times;';
             closeBtn.setAttribute('aria-label', closeLabel);
 
+            header.appendChild(titleEl);
             header.appendChild(closeBtn);
 
             const body = document.createElement('div');
@@ -280,6 +285,11 @@ define([], function() {
             closeBtn.addEventListener('click', closeFs);
             overlay.addEventListener('click', function(ev) {
                 if (ev.target === overlay) {
+                    closeFs();
+                }
+            });
+            body.addEventListener('click', function(ev) {
+                if (ev.target === body) {
                     closeFs();
                 }
             });

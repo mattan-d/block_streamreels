@@ -1,15 +1,15 @@
-/* Stream reels — vertical viewer (Facebook / Reels style) */
+/* Stream reels — viewer styles are scoped to .streamreels-viewer so they still apply in fullscreen (node moves to body). */
+
 .block_streamreels .streamreels-block {
     margin: 0 auto;
+    padding: 0.25rem 0;
 }
 
-.block_streamreels .streamreels-viewer {
+/* --- Viewer core (works inside block OR fullscreen overlay) --- */
+.streamreels-viewer {
     position: relative;
     width: 100%;
-    max-width: min(100%, 320px);
-    margin: 0 auto;
     aspect-ratio: 9 / 16;
-    max-height: min(85vh, 620px);
     border-radius: 14px;
     overflow: hidden;
     background: #0a0a0a;
@@ -18,7 +18,15 @@
     touch-action: pan-y;
 }
 
-.block_streamreels .streamreels-track {
+/* In-block size cap (viewer inside mount only; overlay overrides below) */
+.block_streamreels .streamreels-mount > .streamreels-viewer {
+    max-width: min(100%, 320px);
+    margin-left: auto;
+    margin-right: auto;
+    max-height: min(85vh, 620px);
+}
+
+.streamreels-viewer .streamreels-track {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -26,7 +34,7 @@
     will-change: transform;
 }
 
-.block_streamreels .streamreels-slide {
+.streamreels-viewer .streamreels-slide {
     flex: 0 0 100%;
     height: 100%;
     min-height: 0;
@@ -34,7 +42,7 @@
     box-sizing: border-box;
 }
 
-.block_streamreels .streamreels-slide-media {
+.streamreels-viewer .streamreels-slide-media {
     position: absolute;
     inset: 0;
     background-color: #111;
@@ -42,7 +50,7 @@
     background-position: center;
 }
 
-.block_streamreels .streamreels-embed {
+.streamreels-viewer .streamreels-embed {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -51,21 +59,21 @@
     z-index: 1;
 }
 
-.block_streamreels .streamreels-fallback-link {
+.streamreels-viewer .streamreels-fallback-link {
     position: absolute;
     inset: 0;
     z-index: 1;
     display: block;
 }
 
-.block_streamreels .streamreels-fallback-thumb {
+.streamreels-viewer .streamreels-fallback-thumb {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.block_streamreels .streamreels-slide-meta {
+.streamreels-viewer .streamreels-slide-meta {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -79,30 +87,29 @@
     pointer-events: auto;
 }
 
-.block_streamreels .streamreels-slide-title {
+.streamreels-viewer .streamreels-slide-title {
     font-weight: 600;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     margin-bottom: 0.35rem;
 }
 
-.block_streamreels .streamreels-slide-meta .streamreels-duration {
+.streamreels-viewer .streamreels-slide-meta .streamreels-duration {
     font-size: 0.78rem;
     opacity: 0.85;
     margin-bottom: 0.35rem;
 }
 
-.block_streamreels .streamreels-external {
+.streamreels-viewer .streamreels-external {
     color: rgba(255, 255, 255, 0.92);
     font-size: 0.8rem;
     text-decoration: underline;
 }
 
-.block_streamreels .streamreels-external:hover {
+.streamreels-viewer .streamreels-external:hover {
     color: #fff;
 }
 
-/* Side navigation */
-.block_streamreels .streamreels-nav-col {
+.streamreels-viewer .streamreels-nav-col {
     position: absolute;
     right: 6px;
     top: 50%;
@@ -114,7 +121,7 @@
     pointer-events: auto;
 }
 
-.block_streamreels .streamreels-nav {
+.streamreels-viewer .streamreels-nav {
     width: 38px;
     height: 38px;
     border-radius: 50%;
@@ -132,17 +139,16 @@
     transition: background 0.15s ease, opacity 0.15s ease;
 }
 
-.block_streamreels .streamreels-nav:hover:not(:disabled) {
+.streamreels-viewer .streamreels-nav:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.35);
 }
 
-.block_streamreels .streamreels-nav:disabled {
+.streamreels-viewer .streamreels-nav:disabled {
     opacity: 0.28;
     cursor: default;
 }
 
-/* Progress rail (right edge) */
-.block_streamreels .streamreels-progress {
+.streamreels-viewer .streamreels-progress {
     position: absolute;
     top: 12px;
     bottom: 12px;
@@ -155,7 +161,7 @@
     pointer-events: none;
 }
 
-.block_streamreels .streamreels-progress-bar {
+.streamreels-viewer .streamreels-progress-bar {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -166,8 +172,7 @@
     transition: height 0.35s ease;
 }
 
-/* Counter */
-.block_streamreels .streamreels-counter {
+.streamreels-viewer .streamreels-counter {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -182,64 +187,110 @@
     pointer-events: none;
 }
 
+/* Block chrome only */
 .block_streamreels .streamreels-hint {
     margin-top: 0.5rem;
     font-size: 0.72rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: rgba(0, 0, 0, 0.55);
     text-align: center;
     max-width: 320px;
     margin-left: auto;
     margin-right: auto;
+    line-height: 1.35;
 }
 
-body.behat-site .block_streamreels .streamreels-viewer {
-    max-height: none;
-    aspect-ratio: auto;
-    min-height: 200px;
-}
-
-body.behat-site .block_streamreels .streamreels-track {
-    flex-direction: column;
-    transform: none !important;
-}
-
-body.behat-site .block_streamreels .streamreels-slide {
-    flex: 0 0 auto;
-    min-height: 180px;
-    margin-bottom: 0.5rem;
-}
-
-/* RTL: keep controls on the logical “end” side */
-[dir="rtl"] .block_streamreels .streamreels-nav-col {
-    right: auto;
-    left: 6px;
-}
-
-[dir="rtl"] .block_streamreels .streamreels-progress {
-    right: auto;
-    left: 2px;
-}
-
-[dir="rtl"] .block_streamreels .streamreels-counter {
-    left: auto;
-    right: 10px;
-}
-
-/* Fullscreen modal */
+/* Toolbar + fullscreen entry button */
 .block_streamreels .streamreels-toolbar {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 0.5rem;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0.65rem;
+}
+
+.block_streamreels .streamreels-fs-open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
     max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+    color: rgba(0, 0, 0, 0.52);
+    background: rgba(0, 0, 0, 0.025);
+    box-shadow: none;
+    cursor: pointer;
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.block_streamreels .streamreels-fs-open:hover {
+    color: rgba(0, 0, 0, 0.72);
+    background: rgba(0, 0, 0, 0.045);
+    border-color: rgba(0, 0, 0, 0.14);
+}
+
+.block_streamreels .streamreels-fs-open:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.45);
+    outline-offset: 2px;
+}
+
+.block_streamreels .streamreels-fs-open .streamreels-fs-open-text {
+    flex: 0 1 auto;
+}
+
+.block_streamreels .streamreels-fs-open img {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    flex-shrink: 0;
+    opacity: 0.5;
+    filter: none;
+    vertical-align: middle;
+}
+
+.block_streamreels .streamreels-fs-open:hover img {
+    opacity: 0.65;
+}
+
+@media (prefers-color-scheme: dark) {
+    .block_streamreels .streamreels-fs-open {
+        color: rgba(255, 255, 255, 0.55);
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .block_streamreels .streamreels-fs-open:hover {
+        color: rgba(255, 255, 255, 0.78);
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .block_streamreels .streamreels-fs-open img {
+        opacity: 0.55;
+        filter: brightness(0) invert(1);
+    }
+
+    .block_streamreels .streamreels-fs-open:hover img {
+        opacity: 0.75;
+    }
 }
 
 .block_streamreels .streamreels-fs-placeholder {
     border-radius: 14px;
-    background: rgba(0, 0, 0, 0.04);
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px dashed rgba(0, 0, 0, 0.12);
+    box-sizing: border-box;
 }
 
+/* --- Fullscreen modal --- */
 body.streamreels-fs-open {
     overflow: hidden;
 }
@@ -248,44 +299,77 @@ body.streamreels-fs-open {
     position: fixed;
     inset: 0;
     z-index: 130100;
-    background: rgba(0, 0, 0, 0.94);
     display: flex;
+    flex-direction: column;
     align-items: stretch;
-    justify-content: center;
+    justify-content: stretch;
     box-sizing: border-box;
     padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+    background: rgba(6, 6, 10, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .streamreels-fs-inner {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 100%;
+    height: 100%;
     min-height: 0;
+    flex: 1;
+    max-height: 100vh;
+    max-height: 100dvh;
 }
 
 .streamreels-fs-header {
     flex: 0 0 auto;
     display: flex;
-    justify-content: flex-end;
-    padding: 0.5rem 0.75rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    min-height: 3.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+}
+
+.streamreels-fs-title {
+    flex: 1;
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    text-align: start;
+    padding-inline-end: 0.5rem;
 }
 
 .streamreels-fs-close {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
     color: #fff;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     line-height: 1;
-    padding: 0.25rem 0.65rem;
-    min-width: 2.5rem;
-    border: 0;
-    background: rgba(255, 255, 255, 0.14);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
 
-.streamreels-fs-close:hover,
-.streamreels-fs-close:focus {
-    background: rgba(255, 255, 255, 0.26);
+.streamreels-fs-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.35);
     color: #fff;
+}
+
+.streamreels-fs-close:focus-visible {
+    outline: 2px solid #a78bfa;
+    outline-offset: 2px;
 }
 
 .streamreels-fs-body {
@@ -294,19 +378,60 @@ body.streamreels-fs-open {
     align-items: center;
     justify-content: center;
     min-height: 0;
-    padding: 0 0.5rem 1rem;
+    padding: 0.75rem 1rem 1.25rem;
 }
 
 .streamreels-fs-overlay .streamreels-viewer {
-    width: min(100vw - 1rem, calc((100vh - 5rem) * 9 / 16));
-    max-width: 100%;
-    height: min(100vh - 5rem, calc((100vw - 1rem) * 16 / 9));
-    max-height: min(100vh - 5rem, 92vh);
+    /* Fill most of viewport height; width follows 9:16 */
+    height: min(88vh, 88dvh);
+    max-height: 100%;
+    width: auto;
+    max-width: min(calc(100vw - 2rem), calc(min(88vh, 88dvh) * 9 / 16));
     margin: 0 auto;
     aspect-ratio: 9 / 16;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+/* RTL */
+[dir="rtl"] .streamreels-viewer .streamreels-nav-col {
+    right: auto;
+    left: 6px;
+}
+
+[dir="rtl"] .streamreels-viewer .streamreels-progress {
+    right: auto;
+    left: 2px;
+}
+
+[dir="rtl"] .streamreels-viewer .streamreels-counter {
+    left: auto;
+    right: 10px;
 }
 
 [dir="rtl"] .streamreels-fs-header {
-    justify-content: flex-start;
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .streamreels-fs-title {
+    text-align: end;
+}
+
+/* Behat */
+body.behat-site .block_streamreels .streamreels-mount > .streamreels-viewer {
+    max-height: none;
+    aspect-ratio: auto;
+    min-height: 200px;
+}
+
+body.behat-site .streamreels-viewer .streamreels-track {
+    flex-direction: column;
+    transform: none !important;
+}
+
+body.behat-site .streamreels-viewer .streamreels-slide {
+    flex: 0 0 auto;
+    min-height: 180px;
+    margin-bottom: 0.5rem;
 }

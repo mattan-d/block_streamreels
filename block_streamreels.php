@@ -176,12 +176,13 @@ class block_streamreels extends block_base {
         $hint = html_writer::div(get_string('navigationshint', 'block_streamreels'), 'streamreels-hint');
 
         $openfullscreenlabel = get_string('openfullscreen', 'block_streamreels');
+        $openfstext = html_writer::span($openfullscreenlabel, 'streamreels-fs-open-text');
         $openfs = html_writer::tag(
             'button',
-            $OUTPUT->pix_icon('e/fullscreen', $openfullscreenlabel, 'core'),
+            $OUTPUT->pix_icon('e/fullscreen', '', 'core') . $openfstext,
             [
                 'type' => 'button',
-                'class' => 'streamreels-fs-open btn btn-sm btn-outline-secondary',
+                'class' => 'streamreels-fs-open',
                 'aria-label' => $openfullscreenlabel,
                 'aria-expanded' => 'false',
                 'aria-haspopup' => 'dialog',
