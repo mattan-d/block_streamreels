@@ -114,7 +114,7 @@ class block_streamreels extends block_base {
         $slideshtml = '';
         $slideindex = 0;
         foreach ($slice as $item) {
-            $slide = $this->render_reel_slide($item, $slideindex);
+            $slide = $this->render_reel_slide($item, $slideindex, $config->streamurl);
             if ($slide === '') {
                 continue;
             }
@@ -272,18 +272,58 @@ class block_streamreels extends block_base {
     }
 
     /**
+     * Chromeless reels iframe URL: embed_reels_url, or /embed-reels/{id}, or /embed/{id}?reels=1.
+     *
+     * @param array<string,mixed> $item
+     */
+    private function build_reels_embed_src(array $item, string $streambase): string {
+        $fromapi = $this->reel_field_string($item['embed_reels_url'] ?? '');
+        if ($fromapi !== '') {
+            return $fromapi;
+        }
+
+        $streambase = rtrim(trim($streambase), '/');
+        $id = $this->reel_field_string($item['id'] ?? '');
+        if ($streambase !== '' && $id !== '' && preg_match('/^\d+$/', $id)) {
+            return $streambase . '/embed-reels/' . $id;
+        }
+
+        $classic = $this->reel_field_string($item['embed_url'] ?? '');
+        if ($classic !== '') {
+            return $this->embed_url_with_reels_mode($classic);
+        }
+
+        return '';
+    }
+
+    /**
+     * Append reels=1 to standard embed URLs when not already using embed-reels.
+     *
+     * @param string $url
+     */
+    private function embed_url_with_reels_mode(string $url): string {
+        if (strpos($url, '/embed-reels/') !== false) {
+            return $url;
+        }
+        if (preg_match('/(^|[&?])reels=1(&|$)/', $url)) {
+            return $url;
+        }
+        return $url . (strpos($url, '?') !== false ? '&' : '?') . 'reels=1';
+    }
+
+    /**
      * One vertical slide (embed or fallback link).
      *
      * @param array<string,mixed> $item
      */
-    private function render_reel_slide(array $item, int $index): string {
+    private function render_reel_slide(array $item, int $index, string $streambase): string {
         $titleraw = $this->reel_field_string($item['title'] ?? '');
         $title = $titleraw !== ''
             ? format_string($titleraw, true)
             : get_string('untitled', 'block_streamreels');
 
         $watch = $this->reel_field_string($item['watch_url'] ?? '');
-        $embed = $this->reel_field_string($item['embed_url'] ?? '');
+        $embedsrc = $this->build_reels_embed_src($item, $streambase);
         $thumb = $this->reel_field_string($item['thumbnail'] ?? '');
 
         $durationraw = $this->reel_field_string($item['duration'] ?? '');
@@ -295,13 +335,13 @@ class block_streamreels extends block_base {
         }
 
         $media = '';
-        if ($embed !== '') {
+        if ($embedsrc !== '') {
             $media = html_writer::tag('iframe', '', [
                 'class' => 'streamreels-embed',
                 'title' => $title,
                 'allowfullscreen' => 'true',
-                'allow' => 'autoplay; encrypted-media; picture-in-picture; fullscreen',
-                'data-embed-src' => $embed,
+                'allow' => 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+                'data-embed-src' => $embedsrc,
                 'src' => 'about:blank',
             ]);
         } else if ($watch !== '') {

@@ -28,6 +28,28 @@ define([], function() {
     const WHEEL_THRESHOLD = 72;
 
     /**
+     * Append autoplay query per Stream embed docs: autoplay=1 (or true); player applies muted/playsinline when set.
+     *
+     * @param {string} baseUrl From data-embed-src (unchanged in DOM; we only mutate for the live iframe src).
+     * @returns {string}
+     */
+    function embedUrlForActiveSlide(baseUrl) {
+        if (!baseUrl) {
+            return baseUrl;
+        }
+        try {
+            const u = new URL(baseUrl);
+            if (!u.searchParams.has('autoplay')) {
+                u.searchParams.set('autoplay', '1');
+            }
+            return u.toString();
+        } catch (e) {
+            const sep = baseUrl.indexOf('?') >= 0 ? '&' : '?';
+            return baseUrl + sep + 'autoplay=1';
+        }
+    }
+
+    /**
      * @param {HTMLElement} slide
      */
     function loadSlideMedia(slide) {
@@ -41,7 +63,7 @@ define([], function() {
         }
         const current = iframe.getAttribute('src');
         if (!current || current === 'about:blank') {
-            iframe.setAttribute('src', src);
+            iframe.setAttribute('src', embedUrlForActiveSlide(src));
         }
     }
 
