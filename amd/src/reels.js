@@ -27,6 +27,9 @@ define([], function() {
     const SWIPE_THRESHOLD = 44;
     const WHEEL_THRESHOLD = 72;
 
+    /** @type {null|function(): void} Closes whichever block opened fullscreen last (only one overlay at a time). */
+    let closeAnyActiveFullscreen = null;
+
     /**
      * Append autoplay query per Stream embed docs: autoplay=1 (or true); player applies muted/playsinline when set.
      *
@@ -50,9 +53,29 @@ define([], function() {
     }
 
     /**
-     * @param {HTMLElement} slide
+     * First reel: never autoplay — user taps the player to start (removes autoplay from URL if present).
+     *
+     * @param {string} baseUrl
+     * @returns {string}
      */
-    function loadSlideMedia(slide) {
+    function embedUrlFirstSlide(baseUrl) {
+        if (!baseUrl) {
+            return baseUrl;
+        }
+        try {
+            const u = new URL(baseUrl);
+            u.searchParams.delete('autoplay');
+            return u.toString();
+        } catch (e) {
+            return baseUrl;
+        }
+    }
+
+    /**
+     * @param {HTMLElement} slide
+     * @param {number} activeIndex 0-based; first slide loads without autoplay, others with autoplay=1.
+     */
+    function loadSlideMedia(slide, activeIndex) {
         const iframe = slide.querySelector('iframe.streamreels-embed');
         if (!iframe) {
             return;
@@ -63,7 +86,8 @@ define([], function() {
         }
         const current = iframe.getAttribute('src');
         if (!current || current === 'about:blank') {
-            iframe.setAttribute('src', embedUrlForActiveSlide(src));
+            const url = activeIndex > 0 ? embedUrlForActiveSlide(src) : embedUrlFirstSlide(src);
+            iframe.setAttribute('src', url);
         }
     }
 
@@ -96,7 +120,7 @@ define([], function() {
             s.classList.toggle('is-active', idx === i);
             s.setAttribute('aria-hidden', idx === i ? 'false' : 'true');
             if (idx === i) {
-                loadSlideMedia(s);
+                loadSlideMedia(s, i);
             } else {
                 unloadSlideMedia(s);
             }
@@ -132,9 +156,151 @@ define([], function() {
     }
 
     /**
-     * @param {string} rootId
+     * Fullscreen modal: moves the viewer into a fixed overlay (same element = navigation + iframes stay intact).
+     *
+     * @param {HTMLElement} viewer
+     * @param {HTMLElement|null} openBtn
+     * @param {{closeFullscreen?: string, fullscreenTitle?: string}|undefined} strings
      */
-    function init(rootId) {
+    function setupFullscreenModal(viewer, openBtn, strings) {
+        if (!openBtn) {
+            return;
+        }
+
+        const str = strings || {};
+        const closeLabel = str.closeFullscreen || 'Close fullscreen';
+        const dialogTitle = str.fullscreenTitle || 'Reels';
+
+        /** @type {null|{overlay: HTMLElement, placeholder: HTMLElement, mount: HTMLElement, prevFocus: (Element|null)}} */
+        let fsState = null;
+
+        /**
+         * Close fullscreen overlay and restore viewer into the block.
+         */
+        function closeFs() {
+            if (!fsState) {
+                return;
+            }
+            const st = fsState;
+            fsState = null;
+            if (closeAnyActiveFullscreen === closeFs) {
+                closeAnyActiveFullscreen = null;
+            }
+            document.removeEventListener('keydown', onFsKeydown, true);
+
+            const bodyEl = st.overlay.querySelector('.streamreels-fs-body');
+            if (bodyEl && bodyEl.contains(viewer) && st.placeholder.parentNode === st.mount) {
+                st.mount.replaceChild(viewer, st.placeholder);
+            } else if (viewer.parentNode !== st.mount) {
+                st.mount.insertBefore(viewer, st.mount.firstChild);
+            }
+
+            st.overlay.remove();
+            document.body.classList.remove('streamreels-fs-open');
+            openBtn.setAttribute('aria-expanded', 'false');
+            if (st.prevFocus && typeof st.prevFocus.focus === 'function') {
+                st.prevFocus.focus();
+            }
+        }
+
+        /**
+         * @param {KeyboardEvent} ev
+         */
+        function onFsKeydown(ev) {
+            if (ev.key === 'Escape') {
+                ev.preventDefault();
+                ev.stopPropagation();
+                closeFs();
+            }
+        }
+
+        /**
+         * Open fullscreen overlay (moves the same viewer node).
+         */
+        function openFs() {
+            if (fsState) {
+                return;
+            }
+            if (closeAnyActiveFullscreen) {
+                closeAnyActiveFullscreen();
+            }
+
+            const mount = viewer.parentElement;
+            if (!mount) {
+                return;
+            }
+
+            const placeholder = document.createElement('div');
+            placeholder.className = 'streamreels-fs-placeholder';
+            placeholder.setAttribute('aria-hidden', 'true');
+            placeholder.style.minHeight = viewer.offsetHeight + 'px';
+
+            mount.replaceChild(placeholder, viewer);
+
+            const overlay = document.createElement('div');
+            overlay.className = 'streamreels-fs-overlay';
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('aria-label', dialogTitle);
+
+            const inner = document.createElement('div');
+            inner.className = 'streamreels-fs-inner';
+
+            const header = document.createElement('div');
+            header.className = 'streamreels-fs-header';
+
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'streamreels-fs-close btn btn-icon';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.setAttribute('aria-label', closeLabel);
+
+            header.appendChild(closeBtn);
+
+            const body = document.createElement('div');
+            body.className = 'streamreels-fs-body';
+            body.appendChild(viewer);
+
+            inner.appendChild(header);
+            inner.appendChild(body);
+            overlay.appendChild(inner);
+            document.body.appendChild(overlay);
+
+            document.body.classList.add('streamreels-fs-open');
+
+            fsState = {
+                overlay: overlay,
+                placeholder: placeholder,
+                mount: mount,
+                prevFocus: document.activeElement
+            };
+            closeAnyActiveFullscreen = closeFs;
+
+            openBtn.setAttribute('aria-expanded', 'true');
+            closeBtn.addEventListener('click', closeFs);
+            overlay.addEventListener('click', function(ev) {
+                if (ev.target === overlay) {
+                    closeFs();
+                }
+            });
+            document.addEventListener('keydown', onFsKeydown, true);
+            closeBtn.focus();
+        }
+
+        openBtn.addEventListener('click', function() {
+            if (fsState) {
+                closeFs();
+            } else {
+                openFs();
+            }
+        });
+    }
+
+    /**
+     * @param {string} rootId
+     * @param {{closeFullscreen?: string, fullscreenTitle?: string}|undefined} strings
+     */
+    function init(rootId, strings) {
         const viewer = document.getElementById(rootId);
         if (!viewer) {
             return;
@@ -225,6 +391,10 @@ define([], function() {
                 navigate(viewer, -1);
             }
         });
+
+        const block = viewer.closest('.block_streamreels');
+        const openFsBtn = block ? block.querySelector('.streamreels-fs-open') : null;
+        setupFullscreenModal(viewer, openFsBtn, strings);
 
         goTo(viewer, 0);
     }

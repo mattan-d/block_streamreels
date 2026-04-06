@@ -224,3 +224,89 @@ body.behat-site .block_streamreels .streamreels-slide {
     left: auto;
     right: 10px;
 }
+
+/* Fullscreen modal */
+.block_streamreels .streamreels-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.block_streamreels .streamreels-fs-placeholder {
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+body.streamreels-fs-open {
+    overflow: hidden;
+}
+
+.streamreels-fs-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 130100;
+    background: rgba(0, 0, 0, 0.94);
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+}
+
+.streamreels-fs-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+}
+
+.streamreels-fs-header {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 0.75rem;
+}
+
+.streamreels-fs-close {
+    color: #fff;
+    font-size: 1.75rem;
+    line-height: 1;
+    padding: 0.25rem 0.65rem;
+    min-width: 2.5rem;
+    border: 0;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+}
+
+.streamreels-fs-close:hover,
+.streamreels-fs-close:focus {
+    background: rgba(255, 255, 255, 0.26);
+    color: #fff;
+}
+
+.streamreels-fs-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: 0 0.5rem 1rem;
+}
+
+.streamreels-fs-overlay .streamreels-viewer {
+    width: min(100vw - 1rem, calc((100vh - 5rem) * 9 / 16));
+    max-width: 100%;
+    height: min(100vh - 5rem, calc((100vw - 1rem) * 16 / 9));
+    max-height: min(100vh - 5rem, 92vh);
+    margin: 0 auto;
+    aspect-ratio: 9 / 16;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+}
+
+[dir="rtl"] .streamreels-fs-header {
+    justify-content: flex-start;
+}

@@ -37,6 +37,9 @@ $string['previousreel'] = 'Previous reel';
 $string['openinstream'] = 'Open in Stream';
 $string['viewerregion'] = 'Teacher reels';
 $string['navigationshint'] = 'Swipe up or tap the right side for the next video. Swipe down or tap the left for the previous one.';
+$string['openfullscreen'] = 'Fullscreen';
+$string['closefullscreen'] = 'Close fullscreen';
+$string['fullscreentitle'] = 'Reels — fullscreen';
 
 $string['privacy:metadata:streamreels'] = 'The block requests reels from your Stream instance using teacher email addresses (as configured in the local Stream plugin). The block does not store this data in Moodle.';
 $string['privacy:metadata:streamreels:email'] = 'Teacher email is sent to Stream to match the lecturer’s reels.';

@@ -37,6 +37,9 @@ $string['previousreel'] = 'רילס קודם';
 $string['openinstream'] = 'פתיחה ב־Stream';
 $string['viewerregion'] = 'רילס של המרצה';
 $string['navigationshint'] = 'החלקה למעלה או הקשה בצד ימין — הסרטון הבא. החלקה למטה או הקשה בצד שמאל — הקודם.';
+$string['openfullscreen'] = 'מסך מלא';
+$string['closefullscreen'] = 'סגירת מסך מלא';
+$string['fullscreentitle'] = 'רילס — מסך מלא';
 
 $string['privacy:metadata:streamreels'] = 'הבלוק מבקש רילס ממופע Stream באמצעות כתובות דוא״ל של מרצים (כפי שהוגדרו בתוסף Stream המקומי). הבלוק אינו שומר מידע זה במודל.';
 $string['privacy:metadata:streamreels:email'] = 'דוא״ל של מרצים נשלח ל־Stream כדי להתאים את הרילס של המרצה.';

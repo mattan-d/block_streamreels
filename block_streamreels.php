@@ -58,7 +58,7 @@ class block_streamreels extends block_base {
     }
 
     public function get_content() {
-        global $CFG, $DB;
+        global $CFG, $DB, $OUTPUT;
 
         if ($this->content !== null) {
             return $this->content;
@@ -175,9 +175,31 @@ class block_streamreels extends block_base {
 
         $hint = html_writer::div(get_string('navigationshint', 'block_streamreels'), 'streamreels-hint');
 
-        $this->page->requires->js_call_amd('block_streamreels/reels', 'init', [$viewerid]);
+        $openfullscreenlabel = get_string('openfullscreen', 'block_streamreels');
+        $openfs = html_writer::tag(
+            'button',
+            $OUTPUT->pix_icon('e/fullscreen', $openfullscreenlabel, 'core'),
+            [
+                'type' => 'button',
+                'class' => 'streamreels-fs-open btn btn-sm btn-outline-secondary',
+                'aria-label' => $openfullscreenlabel,
+                'aria-expanded' => 'false',
+                'aria-haspopup' => 'dialog',
+            ]
+        );
+        $toolbar = html_writer::div($openfs, 'streamreels-toolbar');
 
-        $this->content->text = html_writer::div($viewer . $hint, 'streamreels-block');
+        $mount = html_writer::div($viewer . $hint, 'streamreels-mount');
+
+        $this->page->requires->js_call_amd('block_streamreels/reels', 'init', [
+            $viewerid,
+            [
+                'closeFullscreen' => get_string('closefullscreen', 'block_streamreels'),
+                'fullscreenTitle' => get_string('fullscreentitle', 'block_streamreels'),
+            ],
+        ]);
+
+        $this->content->text = html_writer::div($toolbar . $mount, 'streamreels-block');
 
         return $this->content;
     }
